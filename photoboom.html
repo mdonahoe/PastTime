@@ -1,0 +1,152 @@
+<html>
+<head>
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<title>photoboom</title>
+<script src="/all.js"></script>
+<script>
+MAX_IMAGES = 7000;
+img_history = [];
+
+var randomimages = function(){
+	var r = Math.floor(Math.random()*MAX_IMAGES);
+	//r=0;
+	var d = {'uploaded_image':r+':'+(r+70)};
+	if (currentID!='') d[currentID.replace('.','-')] = -1;
+	$.ajax({
+		url: '/db/',
+		timeout:50000,
+		data: d,
+		cache:false,
+		success: function (docs){
+			images = img_history.slice(0);
+			for (var i in docs){
+				var doc = docs[i];
+				images.push(m2.parse(doc.data));
+			}
+			placeimages(images);
+		},
+		dataType:'json',
+		error: function(req,status,e){
+			alert('errr');
+		}
+	});
+}
+
+var indexer = function(size,x,y){
+	var s = Math.floor(size/2);
+	var nx=x-s;
+	var ny=y-s;
+	if (nx<0) nx=0;
+	if (nx+size>MAXX) nx = MAXX-size;
+	if (ny<0) ny=0;
+	if (ny+size>MAXY) ny = MAXY-size;
+	return [nx,ny];
+}
+
+var start=function(){
+	grid = {};
+	placeimages(images.slice(0,100));
+}
+grid = {}
+MAXX=10;
+MAXY=7;
+placeimages = function(names){
+	var x=y=0;
+	while (y<MAXY&&names.length>0){
+		if (grid[x+','+y]==undefined){
+			$('#grid').append(makethumb(names.shift(),x,y));
+		}
+		x+=1;
+		if (x>=MAXX){ x=0;y+=1;}
+	}
+}
+makethumb = function(n,x,y){
+	var s='<a ';
+	s += 'style="'+imgstyler(x,y)+'" ';
+	s += 'href="javascript:touched(\''+n+'\','+x+','+y+');void(0);"';
+	s+='><img src="thumbs/'+n+'"></a>';
+	return s;
+}
+
+imgstyler = function(x,y){
+	var s='position:absolute;';
+	s+='left:'+(100*x)+'px;';
+	s+='top:'+(100*y)+'px;';
+	return s;
+}
+
+makesmall = function(n,x,y){
+	var s='<a ';
+	s += 'style="'+imgstyler(x,y)+'" ';
+	s += 'href="javascript:touchedagain(\''+n+'\','+x+','+y+');void(0);"';
+	s+='><img src="smalls/'+n+'"></a>';
+	return s;
+}
+makemedium = function(n,x,y){
+	var s='<a ';
+	s += 'style="'+imgstyler(x,y)+'" ';
+	s += 'href="javascript:void(0);"';
+	s+='><img src="mediums/'+n+'"></a>';
+	return s;
+}
+makequicksmall = function(n,x,y){
+		var s='<a ';
+	s += 'style="'+imgstyler(x,y)+'" ';
+	s += 'href="javascript:void(0);"';
+	s+='><img src="thumbs/'+n+'" style="width:300px;"></a>';
+	return s;
+}
+spacegrid = function(x,y,s){
+	grid = {};
+	var xy = indexer(s,x,y);
+	x = xy[0];
+	y = xy[1];
+	for (var i=0;i<s;i++){
+		for (var j=0;j<s;j++){
+			grid[(x+i)+','+(y+j)] = 1;
+		}
+	}
+	return [x,y];
+}
+var touched = function(id,x,y){
+	//img_history.push(id);
+	addunique(img_history,id);
+	if (id!=currentID&&currentID!=''){
+		m2.save(currentID.replace('.','-'),id);
+	}
+	currentID = id;
+	var size = 3;
+	var xy = spacegrid(x,y,size);
+	x = xy[0];
+	y = xy[1];
+	//$('#grid').append(makequicksmall(id,x,y));
+	$('#oldgrid').html($('#grid').html()+makequicksmall(id,x,y));
+	$('#grid').html(makesmall(id,x,y));
+	randomimages();
+}
+var currentID = '';
+var touchedagain = function(id,x,y){
+	var size = 5;
+	var xy = spacegrid(x+1,y+1,size);
+	x = xy[0];
+	y = xy[1];
+	$('#oldgrid').html($('#grid').html());
+	$('#grid').html(makemedium(id,x,y));
+	randomimages();
+}
+addunique = function(xs,x){
+	for (var i in xs){
+		if (xs[i]==x) return;
+	}
+	m2.save('photosession',x);
+	xs.push(x);
+}
+var AB = 0;
+</script>
+</head>
+<body onload="randomimages()" bgcolor="#0000FF">
+<input type=button onclick="start()" value="random">
+<div id=oldgrid></div>
+<div id=grid></div>
