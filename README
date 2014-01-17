@@ -1,5 +1,5 @@
 PastTime
---------
+========
 
 Remember your life history! Find and organize your photos and videos.
 
@@ -12,7 +12,80 @@ But I don't trust them to survive...
 
 I also want to be able to review the data occasionally, and add tags. And invent my own system.
 
-Here is what I had to say about this 3 years ago:
+Here is my current plan
+-----------------------
+
+0. compute summary stats of every file in dst directory
+1. recursively scan a src directory looking for new unique media
+2. copy said media to dst directory
+
+`media` is defined to be images or movies.
+I havent thought about audio yet, but I don't have much of that.
+
+Once this is complete, we will want to start tagging.
+
+Tagging
+-------
+
+Tagging presents two challenges:
+1. acquistion of metadata from an image
+2. storing metadata for an image
+
+Acquisition will likely be a combination of scripts and user-interaction.
+I had a program once that displayed random images and asked the user for tags.
+Olin Works once farmed out a tagging job to 30 people. That worked well.
+Other things could be using EXIF data to correct dates etc.
+
+Storing is tricky because there are different solutions,
+and I have to choose one.
+
+The easiest to manage from a program perspective would involve a database.
+However, databases are not very portable, and are centralized.
+iPhoto has a photo library that steals all your photos and is not user-viewable
+I don't like that personally, but perhaps it is the best way to go.
+
+Why don't I like iPhoto? I can't browse the file-system and see usable photos.
+
+Say I want to upload a photo to a site...
+... I have to export it first using iPhoto, or `share it` from the app itself.
+
+I would rather be able to find all my photos using the filesystem,
+but maybe that is naive and old-fashioned
+
+I experimented with randomly hashed names for photos. How did that turn out?
+Do I still have those photos? Where are the tags? What happened to them?
+
+If PastTime is going to be a monolithic system,
+the iPhoto strategy may not be so bad.
+
+But something doesn't feel right about that strategy yet.
+I hate unreable names!
+
+Picasa takes a different approach.
+It stores its metadata in the containing folder for the images
+and leaves them intact.
+
+picasa.ini files everywhere! Messy!
+
+Also, when you move a photo, you lose the information about it!
+
+It feels better not to mess with the file structure, but losing data sucks.
+
+Could there be another way? Could the info be stored in the image itself?
+
+EXIF tags are interesting, though some programs mess with them.
+
+Is there any real application that solves this problem already?
+Am I wasting my time by thinking about this now?
+
+iPhoto feels close. I could slurp in all my photos,
+let it detect faces and events etc,
+and then export the whole thing to a separate drive and delete my library.
+
+Feels ghetto.
+
+Here is what I had to say about this 3 years ago
+-------------------------------------------------
 
 Imagine a device that you plug into any computer and it grabs all the photos off it.
 Or a website you go to and it sends all your photos over the net
