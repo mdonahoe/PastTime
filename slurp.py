@@ -73,8 +73,8 @@ def make_sure_path_exists(path):
             raise
 
 
-VIDEO = {'avi', 'mov', 'mpeg', 'mpg', 'mp4'}
-IMAGE = {'gif', 'jpeg', 'jpg', 'png', 'tif', 'tiff'}
+VIDEO = {'avi', 'mov', 'mpeg', 'mpg', 'mp4', 'm4v', 'mts', 'wmv'}
+IMAGE = {'gif', 'jpeg', 'jpg', 'png', 'tif', 'tiff', 'bmp', 'tga'}
 ITEMTYPES = VIDEO | IMAGE
 
 
