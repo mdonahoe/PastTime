@@ -143,7 +143,7 @@ class Item(object):
     @property
     def quickhash(self):
         if self._quickhash is None:
-            logger.info('quick hash needed for %s', self.path)
+            logger.debug('quick hash needed for %s', self.path)
             with file(self.path) as f:
                 self._quickhash = hashlib.md5(f.read(1024)).digest()
         return self._quickhash
@@ -311,6 +311,8 @@ class Library(object):
         print '\n'.join(item.path for item in L.dupes)
         print ''
         print 'skips:', len(self.skips)
+        with file('skipped.txt', 'w') as skipped:
+            skipped.write('\n'.join(sorted(self.skips)))
         # breakdown of skipped file-extensions?
 
 
@@ -336,5 +338,5 @@ if len(sys.argv) > 2:
 L.print_stats()
 logger.info('stats time =  %s', stopwatch.lap())
 
-L.save_cache_file()
-logger.info('save time =  %s', stopwatch.lap())
+#L.save_cache_file()
+#logger.info('save time =  %s', stopwatch.lap())
