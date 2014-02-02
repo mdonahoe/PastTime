@@ -25,13 +25,14 @@ the path structure relative to that folder is maintained
 
 todo:
 [ ] better command-line support (aka, use argparse)
-[x] create cache file for faster deduping
-[ ] load cache file
-[ ] compare times with and without cache file
 [ ] error-checking logic
 [ ] standardize output names?
+[ ] rebuild cache file
 [x] verify it actually works on real media
 [x] info logging
+[x] create cache file for faster deduping
+[x] load cache file
+[x] compare times with and without cache file
 
 
 """
