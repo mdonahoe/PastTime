@@ -111,6 +111,10 @@ class Item(object):
         if self.quickhash != other.quickhash:
             return False
 
+        # quick hack: compare filenames
+        if self.filename == other.filename:
+            return True
+
         return self.fullhash == other.fullhash
 
     def copy_to(self, new_path):
