@@ -27,7 +27,10 @@ todo:
 [ ] better command-line support (aka, use argparse)
 [ ] error-checking logic
 [ ] standardize output names?
-[ ] rebuild cache file
+[ ] compute collision stats
+[ ] move files (for local organization)
+[ ] incrementally rebuild cache file
+[ ] statistics on file types
 [x] verify it actually works on real media
 [x] info logging
 [x] create cache file for faster deduping
