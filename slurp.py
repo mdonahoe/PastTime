@@ -76,17 +76,18 @@ ITEMTYPES = VIDEO | IMAGE
 
 
 class Item(object):
-    def __init__(self, path, root=''):
+    def __init__(self, path, root='', lock=True):
         self.path = path
         self._root = root
         self._size = None
         self._quickhash = None
         self._fullhash = None
+        self.locked = lock
 
     @classmethod
     def from_cacheline(cls, cacheline):
         stats, path = cacheline.strip().split(':', 1)
-        item = Item(path)
+        item = Item(path, lock=False)
 
         # use cache instead of reading stats later on filedate
         size, quick, full = stats.split('-')
@@ -116,6 +117,11 @@ class Item(object):
         self.path = new_path
 
     def rename_as(self, new_path):
+        if self.locked:
+            # when copying files into the library...
+            # be careful NOT to modify the src repo
+            logger.error('cannot rename locked item: %s', self.path)
+            return
         logger.info('renaming %s -> %s', self.path, new_path)
         make_sure_path_exists(os.path.dirname(new_path))
         os.rename(self.path, new_path)
@@ -174,7 +180,7 @@ class Library(object):
         # check for cache file
 
         if not os.path.exists(self.cachePath):
-            logger.warn('no cache file found at "%s"!', cachePath)
+            logger.warn('no cache file found at "%s"!', self.cachePath)
             # re need to build a cache of the library
             self._scan(directory)
             return
