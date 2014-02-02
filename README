@@ -69,6 +69,12 @@ picasa.ini files everywhere! Messy!
 
 Also, when you move a photo, you lose the information about it!
 
+Somehow Picasa can detect file moves,
+but if the picasa.ini file is deleted,
+then you are out of luck (I assume)
+
+More infomation on .picasa.ini files
+
 It feels better not to mess with the file structure, but losing data sucks.
 
 Could there be another way? Could the info be stored in the image itself?
