@@ -72,6 +72,11 @@ def make_sure_path_exists(path):
         if exception.errno != errno.EEXIST:
             raise
 
+def prevent_overwrite(path):
+    if os.path.exists(path):
+        # todo, implement this case
+        raise KeyError('name already used, but data different! path=%s' % path)
+
 
 VIDEO = {'avi', 'mov', 'mpeg', 'mpg', 'mp4', 'm4v', 'mts', 'wmv'}
 IMAGE = {'gif', 'jpeg', 'jpg', 'png', 'tif', 'tiff', 'bmp', 'tga'}
@@ -120,6 +125,7 @@ class Item(object):
     def copy_to(self, new_path):
         logger.info('copying %s -> %s', self.path, new_path)
         make_sure_path_exists(os.path.dirname(new_path))
+        prevent_overwrite(new_path)
         shutil.copy(self.path, new_path)
         self.path = new_path
 
@@ -131,6 +137,7 @@ class Item(object):
             return
         logger.info('renaming %s -> %s', self.path, new_path)
         make_sure_path_exists(os.path.dirname(new_path))
+        prevent_overwrite(new_path)
         os.rename(self.path, new_path)
         self.path = new_path
 
