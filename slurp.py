@@ -188,6 +188,8 @@ class Library(object):
     def __init__(self, directory=None):
         self.directory = directory
         self._sizeMap = collections.defaultdict(list)
+        self.added = []
+        self.moved = []
         self.dupes = []
         self.skips = []
 
@@ -223,11 +225,12 @@ class Library(object):
         return sum(1 for _ in self.items)
 
     def _add_path(self, path, root):
+        item = Item(path, root)
         _, ext = os.path.splitext(path)
         if ext.lower()[1:] not in ITEMTYPES:
-            self.skips.append(path)
+            self.skips.append(item)
             return
-        self._add_item(Item(path, root))
+        self._add_item(item)
 
     def _add_item(self, new):
         logger.info('adding item %s', new)
@@ -237,9 +240,12 @@ class Library(object):
                 continue
             logger.warn('duplicate found ("%s" same as "%s")',
                         new.path, item.path)
-            self.dupes.append(new)
-            self._merge_items(item, new)
+            if self._merge_items(item, new):
+                self.merged.append(new)
+            else:
+                self.dupes.append(new)
             return
+        self.added.append(new)
         existing.append(new)
 
     def _merge_items(self, item, dupe):
@@ -266,6 +272,7 @@ class Library(object):
 
         # alter the ORIGINAL item, leave the dupe
         item.rename_as(new_path)
+        return True
 
     def _scan(self, directory):
         skip_hidden = lambda d: d[0] != '.'
@@ -312,15 +319,20 @@ class Library(object):
             # dangerous!
 
     def print_stats(self):
-        print 'sizes:', len(self._sizeMap)
-        print ''
-        print 'dupes:', len(self.dupes)
-        print '\n'.join(item.path for item in L.dupes)
-        print ''
-        print 'skips:', len(self.skips)
-        with file('skipped.txt', 'w') as skipped:
-            skipped.write('\n'.join(sorted(self.skips)))
-        # breakdown of skipped file-extensions?
+        total = len(list(self.items))
+        print 'unique sizes:', len(self._sizeMap)
+        print 'total files:', total
+        print 'category breakdown:'
+        for category in ['added', 'moved', 'dupes', 'skips']:
+            items = getattr(self, category)
+            print '---', category, '---'
+            N = len(items)
+            print 'count:', len(items)
+            print '%:', 1.0 * N / total
+            with file(category + '.txt', 'w') as listing:
+                listing.write('\n'.join(sorted(item.path for item in items)))
+            # todo: median file sys
+            # todo: extension breakdown
 
 
 class StopWatch(object):
